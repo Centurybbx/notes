@@ -2,17 +2,29 @@
 
 ## Installing GNU/Linux
 
+==写在开头：==
 
+**注意！**截止至2021/1/23，还未做PA0的朋友请不要使用WSL2!!!因为在PA0的最后一段中，因WSL2中内置缺少了systemd的支持（且暂时无法解决），请安装debian到物理机或虚拟机中！不要使用WSL2!!!
 
+-----
 
+**步骤：**
 
+- 安装VMware Workstation Pro
 
+  网络上有许多安装教程，请STFW。
+
+- 到Debian官方网站下载Debian
+
+我选择的是完成DVD映像 ---> amd64.
+
+- 下载完毕后在Vmware中创建虚拟机，按照操作步骤进行操作。
+
+> 对于在VMware中安装Debian，在给虚拟机分配存储器大小时尽量选的大一点（我分配了60GB），如果使用默认的20GB则可能会出现在low memory mode中进行安装，进而出现问题。
 
 ## First Exploration with GNU/Linux
 
-
-
-
+​	Debian相比于Ubuntu是十分轻便的，属于轻量级的操作系统。
 
 ## Installing Tools
 
@@ -53,6 +65,8 @@ apt-get install qemu-system        # QEMU
 
 ​	目前看来，vim留给我的感觉就是一个非图形化的编辑器，其可扩展性和自定义性比较强，感觉不需要鼠标的操作就可以完成文本的编辑。不过对于具体的使用，还需要慢慢的尝试和琢磨。
 
+步骤见[链接](https://nju-projectn.github.io/ics-pa-gitbook/ics2020/0.4.html)。（可以对Vim进行扩展和高亮设置，按步骤配置即可）
+
 ## More Exploration
 
 ​	对于这一小节，老师在Gitbook中写的很清楚。
@@ -61,7 +75,11 @@ apt-get install qemu-system        # QEMU
 
 ​	上面明确说了，对于man来说RTFM是STFW的长辈，man相当于一个官方文档，大部分linux的基本操作在其中都可以找到相关解释。
 
-​	在这一小节中，我也在Ubuntu中装了tmux，它就是一个在linux下的多窗口工具，用起来比较方便。多数命令都可以在man中查到。
+​	在这一小节中，我也在Ubuntu中装了tmux，它就是一个在linux下的多窗口工具，用起来比较方便。多数命令都可以在man中查到，也可以STFW。
+
+
+
+-----
 
 - **在WSL2中Ubuntu-20.04下的Vim与Windows剪切板通信的坑**
 
@@ -95,11 +113,12 @@ map! ;p <esc>:read !/mnt/c/Windows/System32/paste.exe <cr>i<bs><esc>    l
 
 ## Getting Source Code for PAs
 
+​	使用Git将github上的项目clone下文件夹中，然后对Git进行一下配置。
 
+​	之后根据步骤使用Makefile编译，不出错即可。
 
+---
 
+- **使用WSL2的坑**
 
-
-
-
-
+开头已经说了，在WSL2中其内部不包含有systemd，在排坑的过程中，我搜索了大量的资料，期间使用了脚本enable systemd，但会引起无休止的循环（Github项目的相关Issue也提到了这个问题），故放弃；后使用systemd genius，发现目前仅有debian的发行版（我用的是Ubuntu-20.04），故放弃。实在无奈，又觉得将debian装在物理机上来回重启实在太蠢，就干脆使用了虚拟机装了一个Debian，也算是下下策了，害，一个PA0花了我整整2天时间，踩了无数个小坑，不过也算是有所收获把。（PS:至少改掉了随手百度的习惯2333）
