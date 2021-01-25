@@ -122,3 +122,15 @@ map! ;p <esc>:read !/mnt/c/Windows/System32/paste.exe <cr>i<bs><esc>    l
 - **使用WSL2的坑**
 
 开头已经说了，在WSL2中其内部不包含有systemd，在排坑的过程中，我搜索了大量的资料，期间使用了脚本enable systemd，但会引起无休止的循环（Github项目的相关Issue也提到了这个问题），故放弃；后使用systemd genius，发现目前仅有debian的发行版（我用的是Ubuntu-20.04），故放弃。实在无奈，又觉得将debian装在物理机上来回重启实在太蠢，就干脆使用了虚拟机装了一个Debian，也算是下下策了，害，一个PA0花了我整整2天时间，踩了无数个小坑，不过也算是有所收获把。（PS:至少改掉了随手百度的习惯2333）
+
+---------
+
+**注：关于Debian10中使用安装VMware-tools的方法：**
+
+​	网络上存在有有许多关于VMware-tools的安装方法，但我试了很多次都发现没有用(且大部分都是针对Ubuntu的)。如果想要在Debian10中使用VMware-tools，其实只需要一行命令：
+
+```linux
+apt-get install open-vm-tools
+```
+
+后面的选项提示根据提示进行输入（我全输的Y）。
