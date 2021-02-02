@@ -238,3 +238,132 @@ L形状的符号代表向下取整，类似于"floor"方法。
 ​	因为选择排序时间太久，在归并排序中，我们每split一次，其时间就会少一点，如果我们”极端“一点，将列表split到仅剩余一项，这样就相当于得到了N个列表，然后将这N个列表使用归并排序排序拼接即可。拼接所需要用时为Theta(N)，对于N个长度的列表，其总共需要log~2~(N)次循环，那么显而易见地，其总共用时为log~2~(N)*N，时间复杂度也就是Theta(nlog(n))。
 
 > 这个例子十分有趣，理解需要自己思考思考。有疑问参看[链接](https://joshhug.gitbooks.io/hug61b/content/chap8/chap83.html)。
+
+## Omega and Amortized Analysis
+
+### 小栗子
+
+分析下面代码的时间复杂度：
+
+```java
+public boolean dup3(int[] a) {
+    int N = a.length;
+    for (int i = 0; i < N; i += 1) {
+        for (int j = 0; j < N; j += 1) {
+            if (a[i] == a[j]) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+```
+
+​	通过观察，无论数组a的长度等于几，这个方法始终会返回true。故R(n) = Theta(1)。
+
+---
+
+分析第二个：
+
+```java
+public boolean dup4(int[] a) {
+    int N = a.length;
+    for (int i = 0; i < N; i += 1) {
+        for (int j = i + 1; j < N; j += 1) {
+            if (a[i] == a[j]) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+```
+
+​	这个相比于之前的难了一点，但如果记住了之前的公式，细心推导还是可以发现在最坏的情况下它和累加和是相同的(也就是Theta(n^2^))。但是，如果当a的长度发生变化时，其R(n)仍旧会发生变化，也就是说影响其时间复杂度的有数组的长度和重复与否。所以如果是最好情况下(数组中全是重复的)，那么其R(n)就是Theta(1)。
+
+​	这个栗子显示出了Big Theta的缺点，Big Theta可以表示一个方法与数组长度有关的特性，但如果这个方法的复杂度不仅仅制约于数组长度(比如有其他影响因素)，那么使用Big O是更合适的，因为Big O描述的是一种小于等于的状态，此时只需要考虑最坏甚至更坏即可。
+
+### Big O Abuse
+
+​	Josh给了一个很有意思的例子来让我们思考哪句话提供的信息是更informative的，如下：
+
+![image-20210202222419550](assets/image-20210202222419550.png)
+
+**Note：**Big O is NOT the same as "worst case". But it is often used as such.
+
+Big O的用处总结：
+
+- 在运行时间因为不同的输入而变化时，我们可以使用它来对算法做一个简单的陈述。
+- 对于一些tricky的问题，我们不知道其真正的runtime，所以我们只能陈述其更高的时间。
+- 证明Big O比Big Theta简单得多，课程不做要求。
+
+### Big Omega
+
+​	相比于Big O和Big Theta，Big Omega是与之相反的定义：
+
+![image-20210202222855486](assets/image-20210202222855486.png)
+
+两种用法：
+
+![image-20210202222948007](assets/image-20210202222948007.png)
+
+(暂时还未体会到其真正的用法...)
+
+三个Big的总结：
+
+![image-20210202223045429](assets/image-20210202223045429.png)
+
+### Amortized Analysis (Intuitive Explanation)
+
+考虑一下两种情况：
+
+1. 每天给一个人3￥。
+2. 一段时间给一个人一部分钱：
+   - 第1天给1￥。
+   - 第2天给2￥。
+   - 第4天给4￥。
+   - 第8天给8￥。
+
+​	对于第一种情况，我们每天都要给一个人3￥，看起来比第二天的要好一些，但实际情况确实第二种情况比第一种情况更省钱！我们可以将第二天的钱数给平摊成每天2￥，这样每次给钱时还能剩余1￥，肯定是要比第一种情况更优的！这就是所要说的平坦常数(amortized constant)。
+
+#### AList Resizing and Amortization
+
+对于之前做过的AList的resize，有以下两种实现形式：
+
+Implementation 1:
+
+```java
+public void addLast(int x) {
+  if (size == items.length) {
+    resize(size + RFACTOR);
+  }
+  items[size] = x;
+  size += 1;
+}
+```
+
+Implementation 2:
+
+```java
+public void addLast(int x) {
+  if (size == items.length) {
+    resize(size * RFACTOR);
+  }
+  items[size] = x;
+  size += 1;
+}
+```
+
+​	第一种实现肯定是非常糟糕的(可以在Linux中进行测试，性能很差!) 因为在每次插入一个数据时都需要将原来的所有数据项copy到一个新的长度加一的列表中，它无疑耗费了巨大性能。
+
+​	但对于第二种实现形式，我们使得RFACTOR = 2，当列表满了的时候它会自动扩充两倍容量，大多数add操作都是Theta(1)，某些操作可能会比较耗时。但如果我们将其总和平摊下来我们会发现其实它是Theta(1)的。如图：
+
+![image-20210202224310031](assets/image-20210202224310031.png)
+
+### Amortized Analysis (Rigorous Explanation)
+
+其实就是分析地细致化了一点，和之前的两个分析是大差不差的。具体的省略，可以参看[链接](https://joshhug.gitbooks.io/hug61b/content/chap8/chap84.html)。
+
+**总结**：
+
+![image-20210202224605740](assets/image-20210202224605740.png)
