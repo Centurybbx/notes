@@ -58,6 +58,8 @@ public interface DisjointSets {
 
 ​	比较x和y简直不要太容易，直接比较下标对应的值即可，如果`id[x] == id[y]`，那就true；反之不行。
 
+### Summary and Code
+
 - 总结
 
 | Implementation | Constructor                                                  | `connect` | `isConnected` |
@@ -134,6 +136,8 @@ public class QuickFindDS implements DisjointSets {
 
 ​	因此想要提升其性能，就必须保证树的分支(Height/Weight)尽可能的小，我们下面讨论的WQU(Weighted Quick Union)会着力解决这个问题。
 
+### Summary and Code
+
 - **总结**
 
 | Implementation | Constructor | `connect` | `isConnected` |
@@ -177,3 +181,63 @@ public class QuickUnionDS implements DisjointSets {
     }
 }
 ```
+
+## Weighted Quick Union(WQU)
+
+接上次在Quick Union中说到，其`connect`和`isconnected`都基于辅助函数`find`，要想使得性能最佳那么就需要树变得更“短”一点。
+
+**新规则：**当我们调用`connect`方法时，我们总是将更小的树挂载更大的树上。
+
+> 思考：有几种方式来判断树的大小呢?
+>
+> 对于WQU，我们以树的元素个数作为衡量一个树大小的标准。当然，对于其他的树我们也可以以树的高度作为衡量树大小的标准，只是对于WQU来说我们规定了以元素个数为衡量大小的依据。
+
+图示说明：
+
+​	这是树T1和T2的初始状态：
+
+![img](assets/9.4.1.png)
+
+​	由此我们有两种连接这两个树的方式：
+
+![img](assets/9.4.2.png)
+
+​	第一种是将T1挂在T2上(显然不符合我们新定义的规矩)，第二种是将T2挂在T1上(很好，正是我们想要的)。
+
+### Maximux height: Log N
+
+​	其实有一定的数学知识就很好理解为什么*maximux height of the tree is Θ(log N)*。(N是Disjoint Sets的元素个数)。
+
+​	根据之前定义的规则，我们总是偏好于将更小的树挂载到更大的树上，也就是说，对于root，其至少有两个分支。当树的高度达到最高时，其两个分支中一个元素占一个单元的高度，总的元素个数为N，那么2^x^ + 1 = N，可以得出`x = log2(N-1)` ，也就相当于Θ(log N)。  
+
+### Summary and Code
+
+| Implementation       | Constructor | `connect` | `isConnected` |
+| -------------------- | ----------- | --------- | ------------- |
+| QuickUnion           | Θ(N)        | O(N)      | O(N)          |
+| QuickFind            | Θ(N)        | Θ(N)      | Θ(1)          |
+| QuickUnion           | Θ(N)        | O(N)      | O(N)          |
+| Weighted Quick Union | Θ(N)        | O(log N)  | O(log N)      |
+
+Code详见Lab6.
+
+## WQU with Path Compression
+
+​	回想之前的`find`方法，它需要从选定的元素开始遍历直到root，但是如果对于元素一个一个进行遍历的话会比较耗时，因此可以提出一个新的方案。
+
+​	由于在每次`find`方法执行时，它都会向上寻找parent，在这个过程中我们可以把其parent与root相连，这样形成的集合结构不会有变化但其形成的树的高度会变低，进而降低了寻找的次数。
+
+​	具体过程见[视频详解](https://www.youtube.com/watch?v=DZKzDebT4gU&feature=emb_logo)。
+
+### Summary
+
+N: number of elements in Disjoint Set
+
+| Implementation             | `isConnected` | `connect` |
+| -------------------------- | ------------- | --------- |
+| Quick Find                 | Θ(N)          | Θ(1)      |
+| Quick Union                | O(N)          | O(N)      |
+| Weighted Quick Union (WQU) | O(log N)      | O(log N)  |
+| WQU with Path Compression  | O(α(N))*      | O(α(N))*  |
+
+Code in lab6。
